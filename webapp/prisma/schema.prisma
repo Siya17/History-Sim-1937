@@ -1,0 +1,147 @@
+generator client {
+  provider = "prisma-client"
+  output = "../src/generated/classroom"
+}
+datasource db {
+  provider = "postgresql"
+}
+model User {
+  id String @id
+  name String
+  email String @unique
+  emailVerified Boolean @default(false)
+  image String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  sessions Session[]
+  accounts Account[]
+  games Game[]
+}
+model Session {
+  id String @id
+  expiresAt DateTime
+  token String @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId])
+}
+model Account {
+  id String @id
+  accountId String
+  providerId String
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken String?
+  refreshToken String?
+  idToken String?
+  accessTokenExpiresAt DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope String?
+  password String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([userId])
+}
+model Verification {
+  id String @id
+  identifier String
+  value String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([identifier])
+}
+model Game {
+  id String @id @default(uuid())
+  roomCode String @unique
+  title String
+  teacherId String
+  teacher User @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  state Json
+  version Int @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  teams Team[]
+  commands ProcessedCommand[]
+  events GameEvent[]
+  rounds Round[]
+  alliances Alliance[]
+  proposals Proposal[]
+  @@index([teacherId, createdAt])
+}
+model Team {
+  id String @id @default(uuid())
+  gameId String
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  country String
+  name String
+  codeHash String
+  sessions DeviceSession[]
+  @@unique([gameId, country])
+}
+model DeviceSession {
+  id String @id @default(uuid())
+  tokenHash String @unique
+  teamId String
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  @@index([teamId])
+}
+model ProcessedCommand {
+  id String @id @default(uuid())
+  gameId String
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  actor String
+  requestId String
+  fingerprint String
+  result Json
+  @@unique([gameId, actor, requestId])
+}
+model GameEvent {
+  id String @id @default(uuid())
+  gameId String
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  sequence Int
+  round Int
+  createdAt DateTime
+  category String
+  message Json
+  @@unique([gameId, sequence])
+}
+model Round {
+  id String @id @default(uuid())
+  gameId String
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  number Int
+  summary Json
+  @@unique([gameId, number])
+}
+model Alliance {
+  id String @id @default(uuid())
+  gameId String
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  countryA String
+  countryB String
+  @@unique([gameId, countryA, countryB])
+}
+model Proposal {
+  id String @id
+  gameId String
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  sender String
+  recipient String
+  kind String
+  round Int
+  status String
+  @@index([gameId, status])
+}
+model RateLimit {
+  id String @id
+  key String @unique
+  count Int
+  lastRequest BigInt
+}

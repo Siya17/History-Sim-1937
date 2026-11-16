@@ -1,3 +1,11 @@
+# 1937 Classroom Simulation
+
+The standalone multiplayer web app is in **[webapp](webapp/README.md)**. It includes teacher login, team access, Classroom Rules v2, PostgreSQL persistence, classroom dashboards, and Vercel deployment instructions.
+
+The Python/Google Sheets version below is retained as a legacy reference. Its rules differ from Classroom Rules v2.
+
+---
+
 # 1937 Simulation Game
 
 This project is a historical simulation game engine set in 1937. It is structured as a modular Python application using a custom library for the game logic and a runner script for execution.

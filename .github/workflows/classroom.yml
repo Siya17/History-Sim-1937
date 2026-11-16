@@ -1,0 +1,46 @@
+name: Classroom checks
+on: [push, pull_request]
+jobs:
+  classroom:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: webapp
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: classroom
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/classroom
+      BETTER_AUTH_SECRET: ci-only-secret-for-classroom-tests-not-for-production
+      BETTER_AUTH_URL: http://localhost:3000
+      TEACHER_EMAIL: teacher@example.test
+      TEACHER_PASSWORD: ci-only-password-for-classroom-tests
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: webapp/package-lock.json
+      - run: npm ci
+      - run: npm run db:migrate
+      - run: npm run teacher:setup
+      - name: Rehearse database backup and restore
+        run: |
+          docker exec ${{ job.services.postgres.id }} pg_dump -U postgres -Fc classroom > /tmp/classroom.backup
+          docker exec ${{ job.services.postgres.id }} createdb -U postgres classroom_restore
+          docker exec -i ${{ job.services.postgres.id }} pg_restore -U postgres -d classroom_restore < /tmp/classroom.backup
+          test "$(docker exec ${{ job.services.postgres.id }} psql -U postgres -d classroom_restore -tAc 'SELECT COUNT(*) FROM "User"')" = "1"
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
