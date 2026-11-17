@@ -1,0 +1,42 @@
+[
+  {
+    "name": "industry",
+    "source": "public/art/industry.webp",
+    "prompt": "Use case: historical-scene. Asset type: wide landscape illustration for a readable historical strategy classroom game action card. Subject: a 1930s factory workshop with machine tools and workers. Style: beautifully composed engraved editorial illustration with etched linework and subtle gouache, period 1937 atmosphere, restrained parchment gold and ivory highlights, deep charcoal navy and muted teal shadows. Composition: single cohesive landscape scene, 3:2 ratio, no frames, clear silhouette focal subject at center, readable at small card size, textured paper. No text, letters, labels, flags, logos, propaganda symbols, modern equipment or graphic violence. This is one of eight visually coordinated game illustrations."
+  },
+  {
+    "name": "transport",
+    "source": "public/art/transport.webp",
+    "prompt": "Use case: historical-scene. Asset type: wide landscape illustration for a readable historical strategy classroom game action card. Subject: a 1930s steam locomotive and railway freight yard. Style: beautifully composed engraved editorial illustration with etched linework and subtle gouache, period 1937 atmosphere, restrained parchment gold and ivory highlights, deep charcoal navy and muted teal shadows. Composition: single cohesive landscape scene, 3:2 ratio, no frames, clear silhouette focal subject at center, readable at small card size, textured paper. No text, letters, labels, flags, logos, propaganda symbols, modern equipment or graphic violence. This is one of eight visually coordinated game illustrations."
+  },
+  {
+    "name": "navy",
+    "source": "public/art/navy.webp",
+    "prompt": "Use case: historical-scene. Asset type: wide landscape illustration for a readable historical strategy classroom game action card. Subject: a 1930s naval cruiser at a dockyard. Style: beautifully composed engraved editorial illustration with etched linework and subtle gouache, period 1937 atmosphere, restrained parchment gold and ivory highlights, deep charcoal navy and muted teal shadows. Composition: single cohesive landscape scene, 3:2 ratio, no frames, clear silhouette focal subject at center, readable at small card size, textured paper. No text, letters, labels, flags, logos, propaganda symbols, modern equipment or graphic violence. This is one of eight visually coordinated game illustrations."
+  },
+  {
+    "name": "aviation",
+    "source": "public/art/aviation.webp",
+    "prompt": "Use case: historical-scene. Asset type: wide landscape illustration for a readable historical strategy classroom game action card. Subject: 1930s propeller aircraft and crews on a grass airfield. Style: beautifully composed engraved editorial illustration with etched linework and subtle gouache, period 1937 atmosphere, restrained parchment gold and ivory highlights, deep charcoal navy and muted teal shadows. Composition: single cohesive landscape scene, 3:2 ratio, no frames, clear silhouette focal subject at center, readable at small card size, textured paper. No text, letters, labels, flags, logos, propaganda symbols, modern equipment or graphic violence. This is one of eight visually coordinated game illustrations."
+  },
+  {
+    "name": "army",
+    "source": "public/art/army.webp",
+    "prompt": "Use case: historical-scene. Asset type: wide landscape illustration for a readable historical strategy classroom game action card. Subject: 1930s army personnel training with field equipment. Style: beautifully composed engraved editorial illustration with etched linework and subtle gouache, period 1937 atmosphere, restrained parchment gold and ivory highlights, deep charcoal navy and muted teal shadows. Composition: single cohesive landscape scene, 3:2 ratio, no frames, clear silhouette focal subject at center, readable at small card size, textured paper. No text, letters, labels, flags, logos, propaganda symbols, modern equipment or graphic violence. This is one of eight visually coordinated game illustrations."
+  },
+  {
+    "name": "public",
+    "source": "public/art/public.webp",
+    "prompt": "Use case: historical-scene. Asset type: wide landscape illustration for a readable historical strategy classroom game action card. Subject: an orderly 1930s public meeting in a town square. Style: beautifully composed engraved editorial illustration with etched linework and subtle gouache, period 1937 atmosphere, restrained parchment gold and ivory highlights, deep charcoal navy and muted teal shadows. Composition: single cohesive landscape scene, 3:2 ratio, no frames, clear silhouette focal subject at center, readable at small card size, textured paper. No text, letters, labels, flags, logos, propaganda symbols, modern equipment or graphic violence. This is one of eight visually coordinated game illustrations."
+  },
+  {
+    "name": "diplomacy",
+    "source": "public/art/diplomacy.webp",
+    "prompt": "Use case: historical-scene. Asset type: wide landscape illustration for a readable historical strategy classroom game action card. Subject: 1930s diplomats around a conference table with papers. Style: beautifully composed engraved editorial illustration with etched linework and subtle gouache, period 1937 atmosphere, restrained parchment gold and ivory highlights, deep charcoal navy and muted teal shadows. Composition: single cohesive landscape scene, 3:2 ratio, no frames, clear silhouette focal subject at center, readable at small card size, textured paper. No text, letters, labels, flags, logos, propaganda symbols, modern equipment or graphic violence. This is one of eight visually coordinated game illustrations."
+  },
+  {
+    "name": "trade",
+    "source": "public/art/trade.webp",
+    "prompt": "Use case: historical-scene. Asset type: wide landscape illustration for a readable historical strategy classroom game action card. Subject: a 1930s inland market and merchants exchanging goods. Style: beautifully composed engraved editorial illustration with etched linework and subtle gouache, period 1937 atmosphere, restrained parchment gold and ivory highlights, deep charcoal navy and muted teal shadows. Composition: single cohesive landscape scene, 3:2 ratio, no frames, clear silhouette focal subject at center, readable at small card size, textured paper. No text, letters, labels, flags, logos, propaganda symbols, modern equipment or graphic violence. This is one of eight visually coordinated game illustrations."
+  }
+]

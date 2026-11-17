@@ -1,3 +1,10 @@
+import {
+  BUILD_RULES,
+  TRADE_COST,
+  allianceCost,
+  scoringBreakdown,
+  RuleError,
+} from "./rules";
 import { INITIAL_COUNTRIES, EVENT_DECK, type ResourceType } from "./gameEngine";
 export type Phase =
   "LOBBY" | "RUNNING" | "PAUSED" | "BETWEEN_ROUNDS" | "FINISHED" | "ARCHIVED";
@@ -132,13 +139,30 @@ export function initialState(totalRounds = 9, duration = 420): State {
   };
 }
 function requireRule(ok: unknown, message: string): asserts ok {
-  if (!ok) throw new Error(message);
+  if (!ok)
+    throw new RuleError(
+      message,
+      message.includes("No orders")
+        ? "NO_ACTIONS"
+        : message.includes("Stale round")
+          ? "STALE_ROUND"
+          : message.includes("not accepting")
+            ? "ROUND_CLOSED"
+            : message.includes("Special power")
+              ? "SPECIAL_USED"
+              : "ACTION_UNAVAILABLE",
+    );
 }
 function mod(c: Country, r: ResourceType, n: number) {
   c[r] = Math.max(0, Math.min(15, c[r] + n));
 }
 function cost(c: Country, r: ResourceType, n: number) {
-  requireRule(c[r] >= n, `Insufficient ${r}: need ${n} / 資源不足`);
+  if (c[r] < n)
+    throw new RuleError(
+      `Insufficient ${r}: need ${n} / 資源不足`,
+      "INSUFFICIENT_RESOURCE",
+      { resource: r, required: n, current: c[r] },
+    );
   mod(c, r, -n);
 }
 function order(c: Country) {
@@ -165,26 +189,7 @@ function free(c: Country) {
   c.mil = Math.max(3, c.mil);
 }
 export function score(c: Country, s: State) {
-  if (c.master) return 1;
-  const ideology = INITIAL_COUNTRIES.find(
-    (d) => d.name_en === c.name,
-  )!.ideology;
-  let gain = 1;
-  if (ideology.includes("Fascist"))
-    gain +=
-      (c.mil >= 10 ? 2 : c.mil >= 9 ? 1 : 0) +
-      (allies(s, c.name).length >= 3 ? 1 : 0);
-  if (ideology.includes("Liberal"))
-    gain +=
-      (c.econ >= 10 ? 2 : c.econ >= 9 ? 1 : 0) +
-      (allies(s, c.name).length >= 3 ? 1 : 0);
-  if (ideology.includes("Communist"))
-    gain += (c.pol >= 9 ? 2 : c.pol >= 8 ? 1 : 0) + (c.mil >= 8 ? 1 : 0);
-  if (ideology.includes("Neutral"))
-    gain +=
-      (c.econ >= 8 && c.mil >= 5 ? 2 : c.econ >= 7 || c.mil >= 4 ? 1 : 0) +
-      (c.dip >= 7 ? 1 : 0);
-  return gain;
+  return scoringBreakdown(c, allies(s, c.name).length).total;
 }
 export function closeRound(s: State, now: number) {
   if (s.phase !== "RUNNING" && s.phase !== "PAUSED") return;
@@ -442,8 +447,8 @@ export function execute(
           ),
           "Already traded this round",
         );
-        cost(from, "dip", 1);
-        cost(c, "dip", 1);
+        cost(from, "dip", TRADE_COST);
+        cost(c, "dip", TRADE_COST);
         mod(from, "econ", 1);
         mod(c, "econ", 1);
       } else {
@@ -452,12 +457,7 @@ export function execute(
           allies(s, c.name).length < 3 && allies(s, from.name).length < 3,
           "Maximum three allies",
         );
-        const a = INITIAL_COUNTRIES.find(
-            (d) => d.name_en === from.name,
-          )!.ideology,
-          b = INITIAL_COUNTRIES.find((d) => d.name_en === c.name)!.ideology;
-        const n =
-          a === b || a.includes("Neutral") || b.includes("Neutral") ? 1 : 2;
+        const n = allianceCost(from.name, c.name);
         cost(from, "dip", n);
         cost(c, "dip", n);
         mod(from, "pol", 1);
@@ -482,16 +482,10 @@ export function execute(
         if (roll(10) >= 6) free(c);
       }
     } else if (cmd.action?.startsWith("BUILD_")) {
-      const index = [
-        "BUILD_ECON",
-        "BUILD_MIL",
-        "BUILD_POL",
-        "BUILD_DIP",
-      ].indexOf(cmd.action);
-      requireRule(index >= 0, "Invalid development");
-      const res = RESOURCES[index];
-      cost(c, RESOURCES[(index + 3) % 4], 2);
-      mod(c, res, roll(10) >= (index < 2 ? 4 : 5) ? 2 : 1);
+      const rule = BUILD_RULES[cmd.action];
+      requireRule(rule, "Invalid development");
+      cost(c, rule.cost, rule.amount);
+      mod(c, rule.gain, roll(10) >= rule.threshold ? 2 : 1);
     } else if (cmd.action === "SPECIAL") {
       requireRule(!c.special, "Special power already used");
       c.special = true;

@@ -88,3 +88,13 @@ See [VERIFICATION.md](VERIFICATION.md) for the executed checks, workload, result
 `GET /api/health` returns a boolean database health result. Failed API operations log a random correlation identifier and error class, without credentials. The app uses short HTTP polling (2.5 seconds while running, 10 seconds otherwise), so no persistent WebSocket server is needed.
 
 Archive retains results. Permanent deletion requires typing the room code and removes only the owning teacher's selected game and related records. There is no automatic deletion policy. Rotate team access when sharing a device or recovering a lost team code.
+
+## Learning interface and tutorial sources
+
+The player interface uses country briefings, illustrated decision cards, full resource names, and a two-minute isolated practice. Decision stories rotate by country and round without changing Rules v2. Browser preferences remember the language, briefing acknowledgment, and notification read state for each game and country. Incoming offers appear in a sticky banner and an awaiting-reply badge; practice keeps real action controls inactive while the classroom timer continues.
+
+- [Bilingual video narration](docs/tutorial-narration.md)
+- [NotebookLM source and storyboard](docs/notebooklm-source.md)
+- [Original illustration prompts and asset paths](docs/art-prompts.md)
+
+Shared rule definitions are in `src/lib/rules.ts`, presentation metadata in `src/lib/presentation.ts`, and the isolated training flow in `src/lib/practice.ts`. Player components live in `src/components/classroom`. No database migration is needed for the learning-interface update. The room response adds a public game identifier and optional structured error details; authentication and command replay remain unchanged.

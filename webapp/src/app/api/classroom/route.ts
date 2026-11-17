@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { createHash, randomBytes, randomInt } from "node:crypto";
 import { z } from "zod";
 import { INITIAL_COUNTRIES } from "@/lib/gameEngine";
+import { RuleError } from "@/lib/rules";
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import {
@@ -307,7 +308,10 @@ export async function POST(req: NextRequest) {
           return { success: true };
         }
         let state = reconcile(original, Date.now());
+        let commandEvents: State["events"] = [];
         let error: string | undefined;
+        let errorCode: string | undefined;
+        let errorParams: Record<string, string | number> | undefined;
         if (data.op === "command") {
           if (!data.command || !data.requestId)
             throw new Error("Command and request ID required");
@@ -344,11 +348,17 @@ export async function POST(req: NextRequest) {
             );
           } catch (e) {
             error = e instanceof Error ? e.message : "Command failed";
+            if (e instanceof RuleError) {
+              errorCode = e.code;
+              errorParams = e.params;
+            }
             state = reconcile(original, Date.now());
           }
+          commandEvents = state.events.slice(original.events.length);
           const response = {
+            events: commandEvents,
             success: !error,
-            ...(error ? { error } : {}),
+            ...(error ? { error, errorCode, errorParams } : {}),
             version:
               game.version +
               (JSON.stringify(state) !== JSON.stringify(original) ? 1 : 0),
@@ -376,7 +386,9 @@ export async function POST(req: NextRequest) {
             };
         return {
           room,
+          gameId: game.id,
           title: game.title,
+          ...(data.op === "command" ? { events: commandEvents } : {}),
           state: visibleState,
           version:
             game.version +
@@ -385,7 +397,7 @@ export async function POST(req: NextRequest) {
           teacher: isTeacher,
           country: actor,
           teams: game.teams.map((t) => ({ country: t.country, name: t.name })),
-          ...(error ? { error } : {}),
+          ...(error ? { error, errorCode, errorParams } : {}),
         };
       },
       { timeout: 15000, maxWait: 10000 },

@@ -2,7 +2,11 @@
 import { useEffect, useState } from "react";
 import { INITIAL_COUNTRIES } from "@/lib/gameEngine";
 import Link from "next/link";
+import { usePreference } from "@/lib/preferences";
 import { useRouter } from "next/navigation";
+import MissionIntro from "@/components/classroom/MissionIntro";
+import PracticeTutorial from "@/components/classroom/PracticeTutorial";
+import { countryName, type Lang } from "@/lib/presentation";
 import { PHASE_NAMES } from "@/lib/classroom";
 import { api } from "@/lib/client";
 type Saved = { room: string; title: string; phase: string };
@@ -15,7 +19,8 @@ export default function Home() {
     [recovery, setRecovery] = useState<{ room: string; code: string } | null>(
       null,
     ),
-    [lang, setLang] = useState("dual"),
+    [lang, setLang] = usePreference<Lang>("1937-language", "dual"),
+    [practice, setPractice] = useState(false),
     [joinRoom, setJoinRoom] = useState("");
   const L = (en: string, ja: string) =>
     lang === "en" ? en : lang === "ja" ? ja : `${en} / ${ja}`;
@@ -85,25 +90,17 @@ export default function Home() {
             <button
               key={l}
               aria-pressed={lang === l}
-              onClick={() => setLang(l)}
+              onClick={() => setLang(l as Lang)}
             >
               {l === "dual" ? "EN / 日本語" : l === "en" ? "English" : "日本語"}
             </button>
           ))}
         </nav>
       </header>
-      <section className="hero">
-        <p className="eyebrow">CLASSROOM RULES V2 · 教室版ルール</p>
-        <h1>
-          {L("Your next move changes the world.", "次の一手が世界を変える。")}
-        </h1>
-        <p>
-          {L(
-            "Negotiate face to face. Make agreements. Lead your country through nine rounds of diplomacy and strategy.",
-            "対面で交渉し、条約を結び、外交と戦略の9ラウンドで国家を導きましょう。",
-          )}
-        </p>
-      </section>
+      <MissionIntro lang={lang} onPractice={() => setPractice(true)} />
+      {practice && (
+        <PracticeTutorial lang={lang} onClose={() => setPractice(false)} />
+      )}
       {error && (
         <p role="alert" className="error">
           {error}
@@ -127,8 +124,8 @@ export default function Home() {
           </a>
         </section>
       )}
-      <div className="grid two">
-        <section className="card">
+      <div className="grid two" inert={practice || undefined}>
+        <section className="card" id="join-classroom">
           <h2>{L("Join a classroom", "授業に参加")}</h2>
           <form onSubmit={(e) => submit(e, "join")}>
             <label>
@@ -153,7 +150,7 @@ export default function Home() {
               <select name="country">
                 {INITIAL_COUNTRIES.map((c) => (
                   <option key={c.name_en} value={c.name_en}>
-                    {c.flag} {L(c.name_en, c.name_ja)}
+                    {countryName(c.name_en, lang)}
                   </option>
                 ))}
               </select>
@@ -175,7 +172,9 @@ export default function Home() {
                 {L("Country", "担当国")}
                 <select name="country">
                   {INITIAL_COUNTRIES.map((c) => (
-                    <option key={c.name_en}>{c.name_en}</option>
+                    <option key={c.name_en} value={c.name_en}>
+                      {countryName(c.name_en, lang)}
+                    </option>
                   ))}
                 </select>
               </label>
